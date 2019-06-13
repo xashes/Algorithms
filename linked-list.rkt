@@ -9,7 +9,8 @@
          llist
          item
          pointer
-         node?)
+         node?
+         llist-append)
 
 ; LL ::= '() | (cons Any LL)
 (define-type LList (U Null node))
@@ -45,12 +46,12 @@
   (if (empty? rst)
       '()
       (construct (first rst)
-                 (llist (rest rst))))
+                 (apply llist (rest rst))))
   )
 (module+ test
   (check-equal? (llist) '())
-  (check-equal? (llist 'a 1)
-                (construct 'a
+  (check-equal? (llist 6 1)
+                (construct 6
                            (construct 1 '())))
   )
 
@@ -70,3 +71,24 @@
   (check-equal? (pointer ll1) ll0)
   )
 
+; append ll2 to ll1
+(: llist-append (-> LList LList LList))
+(define (llist-append ll1 ll2)
+  (if (empty? ll1)
+      ll2
+      (construct (item ll1)
+                 (llist-append (pointer ll1) ll2))
+      )
+  )
+(module+ test
+  (check-equal? (llist-append ll0 ll0) ll0)
+  (check-equal? (llist-append ll0 ll1) ll1)
+  (check-equal? (llist-append ll1 ll0) ll1)
+  (check-equal? (llist-append ll2 ll1) (llist 2 1 1))
+  )
+
+(define (head ll n)
+  ll)
+
+(define (tail ll n)
+  ll)
