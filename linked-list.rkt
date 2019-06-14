@@ -10,7 +10,11 @@
          item
          pointer
          node?
-         llist-append)
+         llist?
+         llist-append
+         llist-head
+         llist-drop
+         )
 
 ; LL ::= '() | (cons Any LL)
 (define-type LList (U Null node))
@@ -87,8 +91,41 @@
   (check-equal? (llist-append ll2 ll1) (llist 2 1 1))
   )
 
-(define (head ll n)
-  ll)
+(: llist-length (-> LList Natural))
+(define (llist-length ll)
+  (if (null? ll)
+      0
+      (add1 (llist-length (pointer ll))))
+  )
+(module+ test
+  (check-equal? (llist-length '()) 0)
+  (check-equal? (llist-length (llist 1 2 3)) 3)
+  )
 
-(define (tail ll n)
-  ll)
+(: llist-head (-> LList Natural LList))
+(define (llist-head ll n)
+  (cond
+    [(> n (llist-length ll)) (error 'llist-head "expected: a LList with at least ~a elements\ngiven: ~a"
+                                    n ll)]
+    [(zero? n) '()]
+    [else (construct (item (assert ll node?))
+                     (llist-head (pointer (assert ll node?)) (sub1 n)))])
+  )
+(module+ test
+  (check-equal? (llist-head (llist 1 2 3) 0) '())
+  (check-equal? (llist-head (llist 1 2 3) 2) (llist 1 2))
+  )
+
+(: llist-drop (-> LList Natural LList))
+(define (llist-drop ll n)
+  (cond
+    [(> n (llist-length ll)) (error 'llist-drop "expected: a LList with at least ~a elements\ngiven: ~a"
+                                    n ll)]
+    [(zero? n) ll]
+    [else (llist-drop (pointer (assert ll node?))
+                      (sub1 n))]))
+(module+ test
+  (check-equal? (llist-drop (llist 1 2 3) 0) (llist 1 2 3))
+  (check-equal? (llist-drop (llist 1 2 3) 2) (llist 3))
+  (check-equal? (llist-drop (llist 1 2 3) 3) '())
+  )
