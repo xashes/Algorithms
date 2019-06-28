@@ -17,11 +17,9 @@
           (let* ([vn (vector-ref vec n)]
                  [tail-sum (- s vn head-sum)]
                  )
-            (cond
-              [(= head-sum tail-sum) n]
-              [else (helper (add1 n) (+ head-sum vn))]
-              )))))
-  )
+            (if (= head-sum tail-sum)
+                n
+                (helper (add1 n) (+ head-sum vn))))))))
 
 (define (pivot-index/for vec)
   (let ([s (vector-sum vec)]
