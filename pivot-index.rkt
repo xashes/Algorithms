@@ -8,21 +8,38 @@
 
 (provide (contract-out [pivot-index (-> (vectorof integer?) nonnegative-integer?)]))
 (define (pivot-index vec)
-  (let ([s (vector-sum vec)])
-    (let helper ([n 0])
-      (let ([partial-sum (vector-sum (vector-take vec n))])
-        (cond
-          [(= n (vector-length vec)) -1]
-          [(= partial-sum (/ s 2)) n]
-          [else (helper (add1 n))]
-          ))
-      ))
+  (let ([s (vector-sum vec)]
+        [len (vector-length vec)])
+    (let helper ([n 0]
+                 [head-sum 0])
+      (if (= n len)
+          -1
+          (let* ([vn (vector-ref vec n)]
+                 [tail-sum (- s vn head-sum)]
+                 )
+            (cond
+              [(= head-sum tail-sum) n]
+              [else (helper (add1 n) (+ head-sum vn))]
+              )))))
+  )
+
+(define (pivot-index/for vec)
+  (let ([s (vector-sum vec)]
+        [len (vector-length vec)])
+    (for/first ([i (in-range len)]
+                #:when (= (vector-sum (vector-take vec i))
+                          (/ (- s (vector-ref vec i)) 2)))
+      i))
   )
 (module+ test
   (require rackunit rackunit/text-ui)
 
   (check-equal? (pivot-index #(1 7 3 6 5 6)) 3)
   (check-equal? (pivot-index #(1 2 3)) -1)
+  (time (pivot-index #100000(1 3 9 8 7 6 2)))
+  (check-equal? (pivot-index/for #(1 7 3 6 5 6)) 3)
+  (check-equal? (pivot-index/for #(1 2 3)) #f)
+  (time (pivot-index/for #10000(1 3 9 8 7 6 2)))
   )
 
 (provide (contract-out [vector-sum (-> (vectorof integer?) integer?)]))
