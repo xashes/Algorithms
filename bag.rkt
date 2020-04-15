@@ -1,15 +1,18 @@
 #lang typed/racket
 
-(require "stats.rkt")
+(module+ test
+  (require typed/rackunit)
+  )
 
 ;; API
-;; empty-bag
-;; add-item
-;; size
+(provide empty-bag
+         add-item
+         empty?
+         size)
 
 (define-type Bag (Listof Real))
 
-(: empty-bag (-> Null))
+(: empty-bag (-> Bag))
 (define (empty-bag)
   null)
 
@@ -22,9 +25,6 @@
   (append l b))
 
 (module+ test
-
-  (require typed/rackunit typed/rackunit/text-ui)
-
   (let* ([eb (empty-bag)]
          [b1 (add-item 1 eb)]
          [b2 (add-item* '(2 3 4 5 6) b1)]
@@ -32,5 +32,22 @@
     (check-equal? b1 '(1))
     (check-equal? b2 '(2 3 4 5 6 1))
     )
+  )
 
+(: empty? (-> Bag Boolean))
+(define (empty? b)
+  (equal? b (empty-bag))
+  )
+(module+ test
+  (check-true (empty? (empty-bag)))
+  (check-false (empty? '(1 2 3)))
+  )
+
+(: size (-> Bag Natural))
+(define (size b)
+  (length b)
+  )
+(module+ test
+  (check-equal? (size (empty-bag)) 0)
+  (check-equal? (size '(1 2 3)) 3)
   )
