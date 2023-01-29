@@ -2,7 +2,7 @@
 (require rackunit)
 
 (define (barrel lat)
-  (let ([l range (11)])
+  (let ([l (range (11))])
     (cond [(null? lat) '()]
           )))
 

@@ -1,0 +1,11 @@
+// Henderson diagram
+// named after Peter Henderson
+// each solid line represents a stream of values being transmitted
+// the dashed line from the car to the cons and the filter indicates that
+// this is a single value rather than a stream
+digraph structs {
+  node [shape=record];
+  input [shape=record,label="<car> car|<cdr> cdr"];
+  input:car -> cons [style="dashed"];
+  input:cdr -> filter -> sieve -> cons;
+}
